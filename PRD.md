@@ -560,8 +560,10 @@ Slack is deliberate: 26 minutes for Wave-1 work that should take 20. One agent w
 
 1. `docker compose up` — four containers healthy, `/api/health` shows `provider: openrouter`, `tool_calling: ok`, and today's request budget.
 2. `/admin` — upload a policy PDF, chunk count appears.
-3. `/chat` — *"How many casual leaves carry forward?"* → cited answer → click the chip → drawer shows the exact clause.
+3. `/chat` — *"How many casual leave days can carry forward into the next year, and by when must they be used?"* → cited answer → click the chip → drawer shows the exact clause. **Use this wording, not a casual paraphrase** — see the retrieval limitation in §15.
 4. `/chat` — *"What's the WFH policy for contractors?"* (not in corpus) → clean refusal, no fabrication. **This is the slide that sells it.**
+
+   Both lines above are measured against the seeded corpus and behave as described. Ad-libbing a reworded question on stage is the one way to make this section misbehave.
 5. `/jobs/new` — generate a Senior Backend Engineer JD; inclusive-language pass flags a phrase.
 6. `/jobs/{id}` — drop 5 resumes → rows move `queued → scored` live, two at a time under the rate limiter. (The board already holds the pre-evaluated seed cohort, so it is never empty if the budget runs dry.)
 7. Top candidate → rubric table with verbatim evidence quotes, gaps, recommendation, and the *"scored on redacted text"* badge.
@@ -596,6 +598,27 @@ Slack is deliberate: 26 minutes for Wave-1 work that should take 20. One agent w
 | Agent writes outside its lane | Medium | Ownership table in the dispatch prompt; Integrator reviews `git status` at every gate and reverts strays |
 | PDF parsing garbage on a real resume | Medium | Seed fixtures are markdown; PDF is the demo path only, with 2 pre-tested files |
 | Provider changes its free tier next week | Medium | Five providers behind one interface; switching is one env var |
+
+### Known limitation — retrieval is phrasing-sensitive
+
+The grounded/refusal decision rests on a cosine-distance floor (`VEC_MAX_DISTANCE = 0.30`). Measured across 34 questions, **the must-answer and must-refuse sets overlap**: rewording the same question moves its distance by up to ~0.20, which is larger than the gap between a real in-corpus question and a real out-of-corpus one.
+
+Concretely, after clause-level chunking and query-alignment enrichment narrowed the overlap by ~60%:
+
+| Question | Should | Distance |
+|---|---|---|
+| "How many casual leave days can carry forward into the next year…" | answer | 0.0918 |
+| Worst seeded in-corpus question | answer | 0.187 |
+| "How many casual leaves carry forward?" (casual paraphrase) | answer | 0.3144 |
+| "Do I need a doctor's note if I'm out sick?" | answer | 0.3157 |
+| "Does the company reimburse relocation expenses…" (short form) | **refuse** | 0.3016 |
+| "…when an employee moves cities for a new role?" (seeded form) | **refuse** | 0.3202 |
+
+A single absolute threshold cannot satisfy all six rows. Relative-gap, z-score, and FTS-agreement mechanisms were each measured and each showed reversals; the z-score separation *degraded* as probes were added, indicating it was fitting noise rather than signal.
+
+**The floor stays at 0.30 deliberately.** It keeps every seeded refusal correct with real margin, at the cost of refusing some casual paraphrases the corpus does answer. That asymmetry is the right one for an HR policy assistant: a refusal is a graceful failure that routes the employee to a human, while a confidently wrong answer carrying real citations is the most damaging output this feature can produce. Raising the floor to 0.32 would fix the paraphrases and leave a 0.0002 margin on a mandatory refusal — a coin flip, not a threshold.
+
+**To actually close this** (out of scope for the one-hour build): embed a synthetic question per clause rather than the clause prose, or move to a stronger retrieval model with a reranker. Both attack the short-query/long-passage mismatch at its source instead of tuning a constant.
 
 **Cut order when time runs out** — drop from the bottom, never the top:
 
