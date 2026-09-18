@@ -19,9 +19,6 @@ interface HealthResponse {
   db: string;
   llm_provider: string;
   llm_model?: string | null;
-  budget_used_today?: number | null;
-  budget_limit?: number | null;
-  routers_loaded?: string[];
 }
 
 interface NavItem {
@@ -62,49 +59,55 @@ function useHealth() {
 }
 
 /**
- * The integrator's main instrument during the build: live provider name and
- * today's request budget, polled every 15s. Turns red near the daily cap,
- * and flags the mock provider unmistakably so nobody demos against it by
- * accident.
+ * Live backend + model status, polled every 15s. Shows which provider/model
+ * is actually serving requests (real product signal worth surfacing) and a
+ * small, proportionate indicator if the backend is unreachable or degraded
+ * — an app that silently hides its own status is worse than one that
+ * quietly admits it.
  */
+function StatusDot({ tone }: { tone: "ok" | "warning" | "danger" | "neutral" }) {
+  const color =
+    tone === "ok"
+      ? "bg-[hsl(var(--success))]"
+      : tone === "warning"
+        ? "bg-[hsl(var(--warning))]"
+        : tone === "danger"
+          ? "bg-[hsl(var(--danger))]"
+          : "bg-[hsl(var(--muted-foreground))]";
+  return <span aria-hidden="true" className={cn("inline-block h-2 w-2 shrink-0 rounded-full", color)} />;
+}
+
 function HealthStrip() {
   const { data, isError } = useHealth();
 
   if (isError) {
-    return <Badge variant="danger">backend unreachable</Badge>;
+    return (
+      <span className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
+        <StatusDot tone="danger" />
+        backend unreachable
+      </span>
+    );
   }
 
   if (!data) {
-    return <Badge variant="neutral">checking…</Badge>;
+    return (
+      <span className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
+        <StatusDot tone="neutral" />
+        checking…
+      </span>
+    );
   }
-
-  const isMock = data.llm_provider?.toLowerCase() === "mock";
-  const used = data.budget_used_today ?? null;
-  const limit = data.budget_limit ?? null;
-  const nearLimit = used !== null && limit !== null && limit - used <= 5;
 
   return (
     <div className="flex flex-wrap items-center gap-2">
-      <Badge variant={data.status === "ok" ? "success" : "warning"}>{data.status}</Badge>
-      <span className="text-xs text-[hsl(var(--muted-foreground))]">
+      <span className="flex items-center gap-2 text-xs text-[hsl(var(--muted-foreground))]">
+        <StatusDot tone={data.status === "ok" ? "ok" : "warning"} />
+        {data.status}
+      </span>
+      <Badge variant="neutral">
         {data.llm_provider}
         {data.llm_model ? ` · ${data.llm_model}` : ""}
-      </span>
-      {isMock && (
-        <Badge variant="warning" className="uppercase tracking-wide">
-          MOCK — no real LLM calls
-        </Badge>
-      )}
-      {used !== null && limit !== null && (
-        <Badge variant={nearLimit ? "danger" : "neutral"}>
-          {used}/{limit} requests today
-        </Badge>
-      )}
-      {data.routers_loaded && data.routers_loaded.length > 0 && (
-        <span className="hidden text-xs text-[hsl(var(--muted-foreground))] lg:inline">
-          routers: {data.routers_loaded.join(", ")}
-        </span>
-      )}
+      </Badge>
     </div>
   );
 }

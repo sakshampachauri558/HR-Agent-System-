@@ -22,7 +22,6 @@ import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxi
 import { api, ApiError } from "../api";
 import type { AnalyticsResponse, ResumeStatus, UsageStat } from "../types";
 import {
-  Badge,
   Button,
   Card,
   CardContent,
@@ -53,23 +52,6 @@ const WARNING = "hsl(var(--warning))";
 const MUTED_FG = "hsl(var(--muted-foreground))";
 const BORDER = "hsl(var(--border))";
 const AXIS_TICK = { fill: MUTED_FG, fontSize: 11 };
-
-// ---------------------------------------------------------------------------
-// Local, additive types. `GET /api/analytics` returns the frozen
-// `AnalyticsResponse` shape (pipeline/score_distribution/skill_gaps/usage)
-// plus `budget_used_today` / `budget_limit` (the same additive pattern
-// `/api/health` and A6's `routers/jobs.py` use) and a `billable` flag per
-// usage row — see `routers/analytics.py`'s `get_analytics` / `_usage`.
-// ---------------------------------------------------------------------------
-interface UsageStatWithBilling extends UsageStat {
-  billable?: boolean;
-}
-
-interface AnalyticsResponseWithBudget extends Omit<AnalyticsResponse, "usage"> {
-  usage: UsageStatWithBilling[];
-  budget_used_today?: number | null;
-  budget_limit?: number | null;
-}
 
 const STATUS_LABEL: Record<ResumeStatus, string> = {
   queued: "Queued",
@@ -239,15 +221,7 @@ function SkillGapsChart({ data }: { data: AnalyticsResponse["skill_gaps"] }) {
 // Chart 4 — LLM usage / spend, by provider
 // ---------------------------------------------------------------------------
 
-function UsagePanel({
-  usage,
-  budgetUsed,
-  budgetLimit,
-}: {
-  usage: UsageStatWithBilling[];
-  budgetUsed: number | null | undefined;
-  budgetLimit: number | null | undefined;
-}) {
+function UsagePanel({ usage }: { usage: UsageStat[] }) {
   if (usage.length === 0) {
     return (
       <EmptyState
@@ -260,15 +234,6 @@ function UsagePanel({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
-        <Badge variant="success">Total inference spend: $0</Badge>
-        {budgetUsed != null && budgetLimit != null && (
-          <Badge variant={budgetLimit - budgetUsed <= 5 ? "danger" : "neutral"}>
-            {budgetUsed}/{budgetLimit} billed requests today
-          </Badge>
-        )}
-      </div>
-
       <ResponsiveContainer width="100%" height={Math.max(120, chartData.length * 40)}>
         <BarChart data={chartData} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
           <CartesianGrid stroke={BORDER} horizontal={false} />
@@ -287,15 +252,14 @@ function UsagePanel({
       </ResponsiveContainer>
 
       <div className="flex flex-col divide-y divide-[hsl(var(--border))] overflow-hidden rounded-md border border-[hsl(var(--border))]">
-        <div className="grid grid-cols-5 gap-2 bg-[hsl(var(--muted))] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[hsl(var(--muted-foreground))]">
+        <div className="grid grid-cols-4 gap-2 bg-[hsl(var(--muted))] px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wide text-[hsl(var(--muted-foreground))]">
           <span>Provider</span>
           <span>Requests</span>
           <span>Avg latency</span>
           <span>Tokens (in/out)</span>
-          <span>Billing</span>
         </div>
         {usage.map((u) => (
-          <div key={`${u.provider}-${u.model}`} className="grid grid-cols-5 items-center gap-2 px-3 py-2 text-xs">
+          <div key={`${u.provider}-${u.model}`} className="grid grid-cols-4 items-center gap-2 px-3 py-2 text-xs">
             <span className="truncate font-medium text-[hsl(var(--foreground))]" title={u.model}>
               {u.provider}
             </span>
@@ -303,13 +267,6 @@ function UsagePanel({
             <span>{Math.round(u.avg_latency_ms)} ms</span>
             <span>
               {u.total_input_tokens.toLocaleString()} / {u.total_output_tokens.toLocaleString()}
-            </span>
-            <span>
-              {u.billable === false ? (
-                <Badge variant="neutral">unbilled</Badge>
-              ) : (
-                <Badge variant="warning">billed</Badge>
-              )}
             </span>
           </div>
         ))}
@@ -460,7 +417,7 @@ function NlQueryBox() {
 export default function Analytics() {
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["analytics"],
-    queryFn: () => api.getAnalytics() as Promise<AnalyticsResponseWithBudget>,
+    queryFn: () => api.getAnalytics(),
   });
 
   const apiError = error as ApiError | null;
@@ -501,8 +458,8 @@ export default function Analytics() {
             <ChartCard title="Skills: matched vs. gaps" description="Top 10 across every evaluation in the pool.">
               <SkillGapsChart data={data.skill_gaps} />
             </ChartCard>
-            <ChartCard title="LLM usage by provider" description="Requests, latency, and tokens from the audit log.">
-              <UsagePanel usage={data.usage} budgetUsed={data.budget_used_today} budgetLimit={data.budget_limit} />
+            <ChartCard title="Model usage" description="Requests, latency, and tokens by provider.">
+              <UsagePanel usage={data.usage} />
             </ChartCard>
           </div>
 

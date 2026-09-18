@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { Shell } from "./components/Shell";
-import { EmptyState, Spinner } from "./components/ui";
+import { Button, EmptyState, Spinner } from "./components/ui";
 
 /**
  * Lazy page registry.
@@ -39,10 +39,9 @@ interface RouteErrorBoundaryState {
 }
 
 /**
- * Catches a failed lazy-page import (module doesn't exist yet, or threw
- * while rendering) and renders a "coming soon" placeholder instead of
- * taking down the whole app. This is what lets the shell boot green before
- * any Wave-1/2 page exists.
+ * Catches a failed lazy-page import or a render-time error on a page and
+ * shows an honest error state with a retry action, instead of taking down
+ * the whole app.
  */
 class RouteErrorBoundary extends React.Component<RouteErrorBoundaryProps, RouteErrorBoundaryState> {
   state: RouteErrorBoundaryState = { hasError: false };
@@ -53,15 +52,20 @@ class RouteErrorBoundary extends React.Component<RouteErrorBoundaryProps, RouteE
 
   componentDidCatch(error: unknown): void {
     // eslint-disable-next-line no-console
-    console.warn(`[shell] "${this.props.label}" page not available yet:`, error);
+    console.warn(`[shell] "${this.props.label}" page failed to load:`, error);
   }
 
   render(): React.ReactNode {
     if (this.state.hasError) {
       return (
         <EmptyState
-          title={`${this.props.label} — coming soon`}
-          description="This page hasn't been wired up yet. Check back shortly."
+          title="Couldn't load this page"
+          description={`Something went wrong loading ${this.props.label}. This is usually temporary.`}
+          action={
+            <Button variant="outline" size="sm" onClick={() => window.location.reload()}>
+              Retry
+            </Button>
+          }
         />
       );
     }

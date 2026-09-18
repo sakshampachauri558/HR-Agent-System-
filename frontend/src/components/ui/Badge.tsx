@@ -20,7 +20,7 @@ const VARIANT_CLASSES: Record<BadgeVariant, string> = {
 
 /**
  * import { Badge } from "../../components/ui";
- * <Badge variant="warning">MOCK — no real LLM calls</Badge>
+ * <Badge variant="success">Scored</Badge>
  */
 export function Badge({ className, variant = "neutral", ...props }: BadgeProps) {
   return (

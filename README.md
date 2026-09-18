@@ -44,18 +44,37 @@ is a single env var (`LLM_PROVIDER`).
 Embeddings are **FastEmbed** (`BAAI/bge-small-en-v1.5`), local and free —
 baked into the backend image at build time, no key, no rate limit.
 
-## A note on privacy — please read before uploading anything real
+## Data handling
 
-- **OpenRouter's free tier caps out at 50 model requests per day** before you
-  buy a one-time $10 credit top-up (which raises the cap to 1,000/day).
-  That's tight, and it's a hard, real limit — not a suggestion.
-- **Free tiers generally train on the prompts you send them.** That's an
-  acceptable trade-off for the synthetic seed data this demo ships with. It
-  is **not** acceptable for real resumes or real employee questions.
-- **The only configuration in this repo where no data leaves the machine is
-  the Ollama offline profile** (`make offline`, or `docker compose --profile
-  offline up`). If you're going to point this at real HR data, run that
-  profile — not OpenRouter, Groq, Gemini, or Cerebras.
+This application sends policy questions and resume text to a third-party model
+provider, which may retain them under its own data policies. That is an
+acceptable trade-off for the synthetic data this repository ships with; it is
+**not** acceptable for real resumes or real employee questions.
 
-The `/admin` page repeats this warning. When in doubt, use synthetic data on
-the hosted providers and switch to Ollama for anything real.
+**The only configuration where no data leaves the machine is the Ollama offline
+profile** (`make offline`). Point the app at real HR data only under that
+profile. The `/admin` page states the same thing at the point of upload, where
+the decision is actually made.
+
+Two design choices follow from this rather than being bolted on afterwards:
+resume text is PII-redacted before the evaluator ever sees it (the model scores
+a redacted document; the reviewer sees the original), and embeddings run locally
+via FastEmbed, so document ingestion makes no network call at all.
+
+## Operational limits
+
+OpenRouter's free tier allows **50 model requests per day** before a one-time
+$10 credit purchase raises it to 1,000. The app enforces its own daily counter
+and returns a typed `llm_budget_exhausted` error rather than failing opaquely at
+the provider. Mock and Ollama calls are excluded from that counter, since
+neither consumes hosted quota.
+
+Free model slugs move behind payment without notice — `llama-3.3-70b-instruct:free`
+did during development. Set `LLM_MODEL` to swap models without a code change, and
+verify a candidate first, since not every free model supports the tool calling the
+evaluator agent requires:
+
+```bash
+docker compose exec -T -e LLM_PROVIDER=openrouter -e LLM_MODEL=<slug> \
+  backend python -m scripts.smoke --probe
+```

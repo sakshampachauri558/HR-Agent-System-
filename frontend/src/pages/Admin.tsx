@@ -192,17 +192,15 @@ export default function Admin() {
         </CardHeader>
         <CardContent className="flex flex-col gap-2 text-sm text-[hsl(var(--muted-foreground))]">
           <p>
-            <Badge variant="warning">data leaves this machine</Badge>{" "}
-            Ingestion itself only runs local embeddings (FastEmbed, no network call) — but the
-            default hosted LLM providers behind Policy Chat (OpenRouter, Groq, Gemini)
-            <strong> generally train on submitted prompts</strong>. Any question an employee asks
-            about an uploaded policy is sent to whichever provider is configured.
+            Ingestion runs local embeddings only, with no network call. However, once a document is
+            uploaded, any question an employee asks about it is sent to the configured third-party
+            model provider and may be retained under that provider&rsquo;s data policies. Avoid
+            uploading documents that contain personal data.
           </p>
           <p>
-            For real employee HR documents, run this app with the <strong>Ollama offline profile</strong>{" "}
-            (<code>docker compose --profile offline up</code>) instead — it runs entirely on this
-            machine, with no API key and no data ever leaving the network. Use only synthetic or
-            already-public policy text with the default hosted providers.
+            For sensitive material, a fully local configuration is available — run{" "}
+            <code>docker compose --profile offline up</code> to process everything on this machine,
+            with nothing sent externally.
           </p>
         </CardContent>
       </Card>
