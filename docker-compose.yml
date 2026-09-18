@@ -1,0 +1,92 @@
+name: peopleops-copilot
+
+# Base stack. `docker compose up --build` runs the production-shaped build.
+# Dev overrides (bind mounts, hot reload, exposed db port) live in
+# docker-compose.override.yml, which Compose loads automatically.
+
+services:
+  db:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hr}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hr}
+      POSTGRES_DB: ${POSTGRES_DB:-hrdb}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Applied once, on first boot of an empty volume. `make reset` re-runs it.
+      - ./db/init.sql:/docker-entrypoint-initdb.d/001-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hr} -d ${POSTGRES_DB:-hrdb}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      target: runtime
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-hr}:${POSTGRES_PASSWORD:-hr}@db:5432/${POSTGRES_DB:-hrdb}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openrouter}
+      LLM_FALLBACK_PROVIDER: ${LLM_FALLBACK_PROVIDER:-groq}
+      # OpenRouter free tier: 20 requests/minute. Stay under it.
+      LLM_RPM: ${LLM_RPM:-18}
+      # OpenRouter free tier: 50 model requests/day before any credit purchase
+      # (1000/day after a one-time $10 top-up). Enforced server-side so the app
+      # fails with a clear message instead of dying at the provider mid-demo.
+      LLM_DAILY_BUDGET: ${LLM_DAILY_BUDGET:-45}
+      EVAL_CONCURRENCY: ${EVAL_CONCURRENCY:-2}
+      RAG_RERANK: ${RAG_RERANK:-false}
+      EMBEDDING_PROVIDER: ${EMBEDDING_PROVIDER:-fastembed}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          python -c "import sys,urllib.request;
+          sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/api/health', timeout=3).status == 200 else 1)"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      target: runtime
+      args:
+        # Empty = same origin. nginx proxies /api to the backend, so the browser
+        # never makes a cross-origin request and CORS never enters the picture.
+        VITE_API_BASE: ""
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Offline / zero-key profile. Not started by a plain `docker compose up`.
+  #   make offline        (pulls the model, then points the backend at ollama)
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["offline"]
+    volumes:
+      - ollama:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  ollama:

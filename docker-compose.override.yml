@@ -1,0 +1,44 @@
+# Development overrides. Compose loads this automatically alongside
+# docker-compose.yml. For a production-shaped run:
+#   docker compose -f docker-compose.yml up --build
+
+services:
+  db:
+    # Exposed only in dev, so psql or a GUI client can reach it.
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+
+  backend:
+    build:
+      target: dev
+    command: >-
+      uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/app
+    volumes:
+      - ./backend/app:/app/app
+      - ./backend/scripts:/app/scripts
+      - ./seed:/app/seed:ro
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      ENV: dev
+      LOG_LEVEL: debug
+
+  frontend:
+    build:
+      target: dev
+    command: npm run dev -- --host 0.0.0.0 --port 5173
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/index.html:/app/index.html
+      # Anonymous volume stops the host bind mount from shadowing the image's
+      # node_modules (which is built for the container's platform).
+      - /app/node_modules
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    environment:
+      # Vite dev server proxies /api to the backend; see vite.config.ts.
+      VITE_API_BASE: ""
+    depends_on:
+      backend:
+        condition: service_started
