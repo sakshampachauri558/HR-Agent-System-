@@ -219,6 +219,18 @@ class _ThrottledAgent:
                 input_tokens=input_tokens,
                 output_tokens=output_tokens,
             )
+        # Surface which provider/model actually served this call -- after a
+        # failover (primary -> `settings.llm_fallback_provider`) this can
+        # differ from the configured default, and the `audit_log` row above
+        # already knows the truth. `pydantic_ai`'s `AgentRunResult` is a
+        # plain, non-frozen, non-slotted dataclass, so attaching extra
+        # attributes here is safe and additive: nothing existing is
+        # renamed, removed, or restructured, and `.output`/`.usage()` are
+        # untouched. Callers (e.g. `agents/evaluator.py`) should prefer
+        # these over `settings.llm_provider` when recording
+        # `evaluations.provider` / `evaluations.model`.
+        result.serving_provider = provider_used
+        result.serving_model = model_used
         return result
 
 

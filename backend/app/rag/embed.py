@@ -8,6 +8,15 @@ stage, `FASTEMBED_CACHE_PATH=/opt/models`). Never downloads at request time
 A4 (RAG Query) imports `embed_query` for turning a user's question into a
 vector for the pgvector cosine search. Keep this surface small and stable:
 `embed_texts` / `embed_query` only.
+
+FIX-3 note (query-alignment enrichment): `ingest.py` calls `embed_texts`
+with each `Chunk.embed_text` (heading + salient keywords ahead of the
+clause -- see `chunk.py`'s `_build_embed_text`), not `Chunk.text` (the
+verbatim document content stored/displayed for citations). That's a
+*passage-side* enrichment only -- both the enriched passage text and the
+raw query still go through this module's existing asymmetric split
+(`passage_embed` here, `query_embed` for the user's question); nothing
+about that asymmetry changes.
 """
 
 from __future__ import annotations

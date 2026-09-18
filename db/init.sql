@@ -154,4 +154,15 @@ $$;
 
 GRANT USAGE ON SCHEMA public TO analytics_ro;
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO analytics_ro;
+
+-- `resumes.raw_text` / `resumes.redacted_text` hold candidate PII (PRD §8).
+-- The table-level GRANT above would otherwise let analytics_ro read them
+-- too; the application-layer allowlist in routers/analytics.py already
+-- keeps the NL->SQL path off those columns, but the role itself should
+-- not be able to read them either -- a DB-level backstop in case that
+-- allowlist is ever wrong. Revoke the blanket table grant on `resumes`
+-- specifically and re-grant only the non-PII columns F6 actually needs.
+REVOKE SELECT ON resumes FROM analytics_ro;
+GRANT SELECT (id, candidate_label, file_name, status, uploaded_at) ON resumes TO analytics_ro;
+
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT ON TABLES TO analytics_ro;

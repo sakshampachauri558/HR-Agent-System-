@@ -337,16 +337,21 @@ async def evaluate_resume(resume_id: UUID, job_id: UUID) -> EvaluationResult:
     output.fit_score = fit_score
     output.recommendation = recommendation
 
-    # `_ThrottledAgent`/`MockAgent` don't surface which provider actually
-    # served the call back to us (a gap in the frozen provider.py
-    # contract), so provider/model are read from configured settings
-    # rather than trusted from the model's own (unreliable) self-report.
+    # Record the provider/model that ACTUALLY served this call, not the one
+    # we asked for. `_ThrottledAgent` may fail over (OpenRouter -> Groq on a
+    # 429/502/503) and sets `serving_provider`/`serving_model` on the result.
+    # An audit row naming the wrong model would undermine the whole point of
+    # F2 being a defensible hiring decision. `MockAgent` never fails over and
+    # doesn't set these, hence the getattr fallbacks. Never trust the model's
+    # own self-report of what it is.
     if settings.llm_provider == "mock":
         provider_used, model_used = "mock", MOCK_MODEL_NAME
     else:
-        provider_used = settings.llm_provider
-        cfg = PROVIDERS.get(provider_used)
-        model_used = cfg.default_model if cfg else "unknown"
+        cfg = PROVIDERS.get(settings.llm_provider)
+        provider_used = getattr(run_result, "serving_provider", None) or settings.llm_provider
+        model_used = getattr(run_result, "serving_model", None) or (
+            cfg.default_model if cfg else "unknown"
+        )
 
     output.meta = EvalMeta(
         provider=provider_used,

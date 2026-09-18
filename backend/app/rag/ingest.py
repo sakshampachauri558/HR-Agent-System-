@@ -102,35 +102,72 @@ def _title_from_filename(filename: str) -> str:
 async def ingest_document(
     session: AsyncSession,
     *,
-    filename: str,
-    content_type: str | None,
-    raw: bytes,
+    filename: str | None = None,
+    content_type: str | None = None,
+    raw: bytes | None = None,
+    title: str | None = None,
+    kind: str | None = None,
+    source_name: str | None = None,
+    text: str | None = None,
 ) -> dict[str, str | int]:
-    """Parse -> chunk -> embed -> persist one uploaded policy file.
+    """Parse -> chunk -> embed -> persist one policy document.
 
-    Returns `{"document_id": str, "chunk_count": int}` (PRD §9
-    `PolicyUploadResponse` shape). Raises `IngestError` for a bad upload --
-    the router maps that to a 4xx, never a 500.
+    Two calling conventions, both keyword-only:
+
+    - Upload path (`routers/policies.py`, unchanged contract): `filename` +
+      `content_type` + `raw` bytes -- parsed here via `parse_document`.
+    - Pre-parsed-text path (`scripts.seed`'s tier-1 introspection, see its
+      `_try_real_ingest`): `title` + `kind` + `source_name` + `text`,
+      already-decoded markdown/plain text, nothing to parse. This is what
+      lets `scripts.seed` exercise this module's real chunk+embed pipeline
+      (FIX-3's clause-level chunking) instead of always falling back to
+      its own inline whole-section chunker -- `scripts.seed` already tries
+      exactly this shape via `inspect.signature`; it just had no matching
+      parameter names to bind before this change.
+
+    Exactly one of `raw` or `text` must be supplied. Returns
+    `{"document_id": str, "chunk_count": int}` (PRD §9
+    `PolicyUploadResponse` shape, and also what `scripts.seed`'s
+    `_extract_chunk_count` recognizes). Raises `IngestError` for a bad
+    upload -- the router maps that to a 4xx, never a 500.
     """
-    if not raw:
-        raise IngestError("empty_file", f"'{filename}' is empty.")
-    if len(raw) > MAX_UPLOAD_BYTES:
-        raise IngestError(
-            "file_too_large",
-            f"'{filename}' exceeds the {MAX_UPLOAD_BYTES // (1024 * 1024)}MB upload limit.",
-        )
+    if raw is not None:
+        if not raw:
+            raise IngestError("empty_file", f"'{filename or 'upload'}' is empty.")
+        if len(raw) > MAX_UPLOAD_BYTES:
+            raise IngestError(
+                "file_too_large",
+                f"'{filename}' exceeds the {MAX_UPLOAD_BYTES // (1024 * 1024)}MB upload limit.",
+            )
+        resolved_kind, resolved_text = parse_document(filename or "upload", content_type, raw)
+        resolved_title = title or _title_from_filename(filename or "upload")
+        resolved_source_name = source_name or filename or "upload"
+    elif text is not None:
+        if not text.strip():
+            raise IngestError("empty_file", f"'{source_name or title or 'document'}' is empty.")
+        resolved_kind = kind or "md"
+        resolved_text = text
+        resolved_title = title or _title_from_filename(source_name or title or "policy")
+        resolved_source_name = source_name or filename or resolved_title
+    else:
+        raise IngestError("empty_file", "ingest_document() needs either `raw` bytes or pre-parsed `text`.")
 
-    kind, text = parse_document(filename, content_type, raw)
-
-    title = _title_from_filename(filename)
-    chunks = chunk_document(text, title=title)
+    chunks = chunk_document(resolved_text, title=resolved_title)
     if not chunks:
-        raise IngestError("unparseable_file", f"No chunkable content found in '{filename}'.")
+        raise IngestError("unparseable_file", f"No chunkable content found in '{resolved_source_name}'.")
 
     # Batched: one embed_texts() call for every chunk, one INSERT for the
     # document, one executemany-style INSERT for all chunks -- not one
     # round trip per chunk, which would be visibly slow on a real policy PDF.
-    vectors = embed_texts([c.text for c in chunks])
+    #
+    # Embeds `c.embed_text` (FIX-3's query-alignment enrichment: heading +
+    # salient keywords ahead of the clause), NOT `c.text` -- `c.text` is
+    # what gets stored in `chunks.text` below and is what the citation
+    # drawer displays verbatim, so it must stay exactly the real document
+    # content. Only the *embedded* representation is enriched; the
+    # asymmetric passage/query embedding split in `embed.py` is unaffected
+    # by this -- both still go through `passage_embed`.
+    vectors = embed_texts([c.embed_text for c in chunks])
 
     document_id = uuid4()
     await execute(
@@ -141,10 +178,10 @@ async def ingest_document(
         """,
         {
             "id": document_id,
-            "title": title,
-            "kind": kind,
-            "source_name": filename,
-            "char_count": len(text),
+            "title": resolved_title,
+            "kind": resolved_kind,
+            "source_name": resolved_source_name,
+            "char_count": len(resolved_text),
         },
     )
 

@@ -173,7 +173,7 @@ export function subscribeSse<T = unknown>(
 }
 
 export interface ResumeStreamEvent {
-  id: string;
+  resume_id: string;
   status: ResumeStatus;
   error?: string | null;
 }

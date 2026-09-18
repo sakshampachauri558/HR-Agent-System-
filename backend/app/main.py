@@ -200,7 +200,10 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     # Map A0's typed provider errors when that module exists. Guarded so
     # this file never hard-depends on A0 finishing first.
     try:
-        from app.llm.throttle import BudgetExhausted, LLMRateLimited  # type: ignore[import-not-found]
+        from app.llm.throttle import (  # type: ignore[import-not-found]
+            BudgetExhausted,
+            LLMRateLimited,
+        )
 
         if isinstance(exc, BudgetExhausted):
             return JSONResponse(
