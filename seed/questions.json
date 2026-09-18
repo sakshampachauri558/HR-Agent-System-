@@ -1,0 +1,86 @@
+[
+  {
+    "question": "How many casual leave days is an employee entitled to per year?",
+    "type": "grounded",
+    "expected_document": "Leave Policy",
+    "expected_section": "2.1 Casual Leave",
+    "expected_answer_keywords": ["12", "casual leave"]
+  },
+  {
+    "question": "How many casual leave days can carry forward into the next year, and by when must they be used?",
+    "type": "grounded",
+    "expected_document": "Leave Policy",
+    "expected_section": "3.1 Casual Leave Carryover",
+    "expected_answer_keywords": ["5", "first quarter"]
+  },
+  {
+    "question": "Do I need to submit a medical certificate for sick leave?",
+    "type": "grounded",
+    "expected_document": "Leave Policy",
+    "expected_section": "2.2 Sick Leave",
+    "expected_answer_keywords": ["medical certificate", "2 consecutive"]
+  },
+  {
+    "question": "How many earned leave days can be carried forward, and can unused earned leave be encashed while still employed?",
+    "type": "grounded",
+    "expected_document": "Leave Policy",
+    "expected_section": "3.2 Earned Leave Carryover and Encashment",
+    "expected_answer_keywords": ["15", "encash"]
+  },
+  {
+    "question": "How many weeks of maternity leave are employees entitled to?",
+    "type": "grounded",
+    "expected_document": "Leave Policy",
+    "expected_section": "5. Maternity and Paternity Leave",
+    "expected_answer_keywords": ["26 weeks"]
+  },
+  {
+    "question": "How many days per week can an eligible employee work from home?",
+    "type": "grounded",
+    "expected_document": "Remote Work Policy",
+    "expected_section": "2.2 Hybrid Work-From-Home Days",
+    "expected_answer_keywords": ["2 days"]
+  },
+  {
+    "question": "What is the one-time home office equipment stipend, and how is it reimbursed?",
+    "type": "grounded",
+    "expected_document": "Remote Work Policy",
+    "expected_section": "3.1 Equipment Stipend",
+    "expected_answer_keywords": ["15,000", "invoices"]
+  },
+  {
+    "question": "Is international remote work allowed without approval?",
+    "type": "grounded",
+    "expected_document": "Remote Work Policy",
+    "expected_section": "6. International Remote Work",
+    "expected_answer_keywords": ["written approval", "HR", "Legal"]
+  },
+  {
+    "question": "Within how many days of incurring an expense must a reimbursement claim be submitted?",
+    "type": "grounded",
+    "expected_document": "Reimbursement Policy",
+    "expected_section": "3.2 Timelines",
+    "expected_answer_keywords": ["30 days"]
+  },
+  {
+    "question": "What is the annual limit for professional certification reimbursement, and is there any payback condition?",
+    "type": "grounded",
+    "expected_document": "Reimbursement Policy",
+    "expected_section": "6. Professional Development and Certification Reimbursement",
+    "expected_answer_keywords": ["50,000", "retention bond"]
+  },
+  {
+    "question": "What's the WFH policy for contractors?",
+    "type": "refusal",
+    "expected_document": null,
+    "expected_section": null,
+    "notes": "The Remote Work Policy is scoped to confirmed employees only and never mentions contractors or consultants. PRD §14 demo step 4 uses this exact question as the refusal slide."
+  },
+  {
+    "question": "Does the company reimburse relocation expenses when an employee moves cities for a new role?",
+    "type": "refusal",
+    "expected_document": null,
+    "expected_section": null,
+    "notes": "Relocation is never mentioned anywhere in the reimbursement policy's categories or exclusions -- genuinely out of corpus, not just excluded."
+  }
+]

@@ -1,0 +1,352 @@
+[
+  {
+    "id": "c0000000-0000-4000-8000-000000000001",
+    "resume_id": "b0000000-0000-4000-8000-000000000001",
+    "job_id": "a0000000-0000-4000-8000-000000000001",
+    "fit_score": 89,
+    "recommendation": "strong_yes",
+    "criteria": [
+      {
+        "criterion": "Must-have skills coverage",
+        "score": 9,
+        "weight": 0.30,
+        "evidence_quote": "built a Django REST API",
+        "reasoning": "Owns a production Django REST API on the core settlement path, directly matching the must-have stack."
+      },
+      {
+        "criterion": "Relevant years of experience",
+        "score": 9,
+        "weight": 0.20,
+        "evidence_quote": "5 years of backend engineering experience",
+        "reasoning": "Meets and exceeds the 5-year minimum with increasing scope across two roles."
+      },
+      {
+        "criterion": "Domain / industry fit",
+        "score": 9,
+        "weight": 0.15,
+        "evidence_quote": "worked in the fintech sector",
+        "reasoning": "Current role is squarely in fintech, building RBI-compliant settlement services -- an exact domain match."
+      },
+      {
+        "criterion": "Seniority & scope of ownership",
+        "score": 9,
+        "weight": 0.15,
+        "evidence_quote": "led a team of 4 engineers",
+        "reasoning": "Formal engineering lead role with sustained ownership of a critical service, not a one-off assignment."
+      },
+      {
+        "criterion": "Project & impact evidence",
+        "score": 9,
+        "weight": 0.10,
+        "evidence_quote": "reduced API latency by 30 percent",
+        "reasoning": "Quantified, verifiable performance win on the highest-traffic endpoint of a production service."
+      },
+      {
+        "criterion": "Education / certifications",
+        "score": 8,
+        "weight": 0.05,
+        "evidence_quote": "bachelor's degree in computer science",
+        "reasoning": "Meets the baseline degree requirement and holds a relevant AWS certification."
+      },
+      {
+        "criterion": "Tenure stability",
+        "score": 7,
+        "weight": 0.05,
+        "evidence_quote": "three years at the previous company",
+        "reasoning": "Two stable multi-year stints with no unexplained gaps."
+      }
+    ],
+    "matched_skills": ["Python", "Django", "REST API design", "PostgreSQL", "Kafka", "Team leadership", "AWS"],
+    "gaps": ["No hands-on Kubernetes production experience mentioned", "AWS only -- no GCP exposure"],
+    "summary": "An excellent match: direct fintech domain experience, a sustained engineering-lead role, and a quantified performance win on the exact stack this role needs.",
+    "meta": {
+      "provider": "seed",
+      "model": "seed-fixture-v1",
+      "rubric_version": "v1",
+      "prompt_version": "v1",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 0
+    }
+  },
+  {
+    "id": "c0000000-0000-4000-8000-000000000002",
+    "resume_id": "b0000000-0000-4000-8000-000000000002",
+    "job_id": "a0000000-0000-4000-8000-000000000001",
+    "fit_score": 71,
+    "recommendation": "yes",
+    "criteria": [
+      {
+        "criterion": "Must-have skills coverage",
+        "score": 8,
+        "weight": 0.30,
+        "evidence_quote": "built a Django REST API",
+        "reasoning": "Owns the Django REST API behind the catalog and inventory service -- a direct stack match."
+      },
+      {
+        "criterion": "Relevant years of experience",
+        "score": 7,
+        "weight": 0.20,
+        "evidence_quote": "5 years of backend engineering experience",
+        "reasoning": "Meets the stated minimum years for this level."
+      },
+      {
+        "criterion": "Domain / industry fit",
+        "score": 5,
+        "weight": 0.15,
+        "evidence_quote": "worked in the fintech sector",
+        "reasoning": "Fintech exposure was brief (about eight months) before moving to e-commerce; adjacent rather than primary domain fit."
+      },
+      {
+        "criterion": "Seniority & scope of ownership",
+        "score": 7,
+        "weight": 0.15,
+        "evidence_quote": "led a team of 4 engineers",
+        "reasoning": "Led a multi-week cross-team hardening project, showing real but time-boxed ownership rather than a standing lead role."
+      },
+      {
+        "criterion": "Project & impact evidence",
+        "score": 8,
+        "weight": 0.10,
+        "evidence_quote": "reduced API latency by 30 percent",
+        "reasoning": "Concrete caching win on a high-traffic product listing endpoint, clearly attributable to this candidate."
+      },
+      {
+        "criterion": "Education / certifications",
+        "score": 7,
+        "weight": 0.05,
+        "evidence_quote": "bachelor's degree in computer science",
+        "reasoning": "Meets the baseline education bar; no additional certifications listed."
+      },
+      {
+        "criterion": "Tenure stability",
+        "score": 7,
+        "weight": 0.05,
+        "evidence_quote": "three years at the previous company",
+        "reasoning": "Stable multi-year tenure at the prior company with no red flags."
+      }
+    ],
+    "matched_skills": ["Python", "Django", "PostgreSQL", "REST APIs", "Docker"],
+    "gaps": ["Limited direct fintech / regulated-industry exposure", "No mention of Kubernetes or cloud infrastructure ownership beyond basic AWS"],
+    "summary": "A solid, well-rounded backend engineer who meets the core bar; the main open question is depth of domain fit and infra breadth rather than raw ability.",
+    "meta": {
+      "provider": "seed",
+      "model": "seed-fixture-v1",
+      "rubric_version": "v1",
+      "prompt_version": "v1",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 0
+    }
+  },
+  {
+    "id": "c0000000-0000-4000-8000-000000000003",
+    "resume_id": "b0000000-0000-4000-8000-000000000003",
+    "job_id": "a0000000-0000-4000-8000-000000000001",
+    "fit_score": 63,
+    "recommendation": "maybe",
+    "criteria": [
+      {
+        "criterion": "Must-have skills coverage",
+        "score": 7,
+        "weight": 0.30,
+        "evidence_quote": "built a Django REST API",
+        "reasoning": "Built and owns a Django REST API for claims data, covering the core must-have stack."
+      },
+      {
+        "criterion": "Relevant years of experience",
+        "score": 7,
+        "weight": 0.20,
+        "evidence_quote": "5 years of backend engineering experience",
+        "reasoning": "Comfortably clears the 5-year minimum across two healthtech roles."
+      },
+      {
+        "criterion": "Domain / industry fit",
+        "score": 5,
+        "weight": 0.15,
+        "evidence_quote": "worked in the fintech sector",
+        "reasoning": "Fintech exposure was a six-month early-career rotation; primary domain expertise is healthtech, not fintech."
+      },
+      {
+        "criterion": "Seniority & scope of ownership",
+        "score": 5,
+        "weight": 0.15,
+        "evidence_quote": "led a team of 4 engineers",
+        "reasoning": "Leadership was a two-week migration sprint rather than a sustained management or tech-lead role."
+      },
+      {
+        "criterion": "Project & impact evidence",
+        "score": 6,
+        "weight": 0.10,
+        "evidence_quote": "reduced API latency by 30 percent",
+        "reasoning": "Clear caching win during a peak billing cycle, though scope is narrower than a full service redesign."
+      },
+      {
+        "criterion": "Education / certifications",
+        "score": 7,
+        "weight": 0.05,
+        "evidence_quote": "bachelor's degree in computer science",
+        "reasoning": "Meets the baseline education bar; no advanced certification listed."
+      },
+      {
+        "criterion": "Tenure stability",
+        "score": 6,
+        "weight": 0.05,
+        "evidence_quote": "three years at the previous company",
+        "reasoning": "Reasonable multi-year tenure with no stated gaps or red flags."
+      }
+    ],
+    "matched_skills": ["Python", "Django", "Flask", "PostgreSQL", "REST APIs"],
+    "gaps": ["Not a current fintech / regulated-industry practitioner", "Leadership evidence is a single short sprint, not sustained scope", "No cloud or container orchestration experience listed"],
+    "summary": "Competent backend engineer with the right core stack, but domain fit and leadership scope are both adjacent rather than direct matches for this role.",
+    "meta": {
+      "provider": "seed",
+      "model": "seed-fixture-v1",
+      "rubric_version": "v1",
+      "prompt_version": "v1",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 0
+    }
+  },
+  {
+    "id": "c0000000-0000-4000-8000-000000000004",
+    "resume_id": "b0000000-0000-4000-8000-000000000004",
+    "job_id": "a0000000-0000-4000-8000-000000000001",
+    "fit_score": 31,
+    "recommendation": "no",
+    "criteria": [
+      {
+        "criterion": "Must-have skills coverage",
+        "score": 3,
+        "weight": 0.30,
+        "evidence_quote": "built a Django REST API",
+        "reasoning": "Only evidence is a personal to-do-list project and an unnamed client prototype; no production Django REST API ownership."
+      },
+      {
+        "criterion": "Relevant years of experience",
+        "score": 3,
+        "weight": 0.20,
+        "evidence_quote": "5 years of backend engineering experience",
+        "reasoning": "The claimed 5 years combines internships, freelance work, and personal projects rather than verifiable backend employment."
+      },
+      {
+        "criterion": "Domain / industry fit",
+        "score": 2,
+        "weight": 0.15,
+        "evidence_quote": null,
+        "reasoning": "Fintech exposure was a three-month support internship with no engineering responsibilities; not evidenced at a domain-fit level."
+      },
+      {
+        "criterion": "Seniority & scope of ownership",
+        "score": 2,
+        "weight": 0.15,
+        "evidence_quote": null,
+        "reasoning": "Only leadership claim is a weekend hackathon team; not evidenced as sustained ownership or scope."
+      },
+      {
+        "criterion": "Project & impact evidence",
+        "score": 4,
+        "weight": 0.10,
+        "evidence_quote": "reduced API latency by 30 percent",
+        "reasoning": "Improvement was on a course project's mock API, not a production workload with real traffic."
+      },
+      {
+        "criterion": "Education / certifications",
+        "score": 6,
+        "weight": 0.05,
+        "evidence_quote": "bachelor's degree in computer science",
+        "reasoning": "Holds the required degree, completed part-time while working; no further certifications."
+      },
+      {
+        "criterion": "Tenure stability",
+        "score": 5,
+        "weight": 0.05,
+        "evidence_quote": "three years at the previous company",
+        "reasoning": "Three stable years at the previous company, though in a retail role unrelated to backend engineering."
+      }
+    ],
+    "matched_skills": ["Python", "Django (learning)", "Git"],
+    "gaps": ["No production backend ownership evidenced", "Career changer with under a year of paid software work", "Domain and leadership claims are not backed by engineering-scale evidence"],
+    "summary": "A career changer with real motivation and a relevant degree, but current evidence falls well short of a senior backend bar; better suited to a junior or associate-level pipeline.",
+    "meta": {
+      "provider": "seed",
+      "model": "seed-fixture-v1",
+      "rubric_version": "v1",
+      "prompt_version": "v1",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 0
+    }
+  },
+  {
+    "id": "c0000000-0000-4000-8000-000000000005",
+    "resume_id": "b0000000-0000-4000-8000-000000000005",
+    "job_id": "a0000000-0000-4000-8000-000000000001",
+    "fit_score": 55,
+    "recommendation": "maybe",
+    "criteria": [
+      {
+        "criterion": "Must-have skills coverage",
+        "score": 5,
+        "weight": 0.30,
+        "evidence_quote": "built a Django REST API",
+        "reasoning": "Built a Django REST API as a side deliverable to a data-engineering initiative, not as a primary responsibility."
+      },
+      {
+        "criterion": "Relevant years of experience",
+        "score": 6,
+        "weight": 0.20,
+        "evidence_quote": "5 years of backend engineering experience",
+        "reasoning": "Total experience is strong, but most of it is data-pipeline engineering rather than customer-facing backend services."
+      },
+      {
+        "criterion": "Domain / industry fit",
+        "score": 4,
+        "weight": 0.15,
+        "evidence_quote": "worked in the fintech sector",
+        "reasoning": "Fintech exposure was early-career ETL work, not current and not backend-service focused."
+      },
+      {
+        "criterion": "Seniority & scope of ownership",
+        "score": 6,
+        "weight": 0.15,
+        "evidence_quote": "led a team of 4 engineers",
+        "reasoning": "Led a real migration initiative, though the scope was data infrastructure rather than backend API ownership."
+      },
+      {
+        "criterion": "Project & impact evidence",
+        "score": 6,
+        "weight": 0.10,
+        "evidence_quote": "reduced API latency by 30 percent",
+        "reasoning": "Genuine, quantified caching improvement on an internal metrics API used by the analytics team."
+      },
+      {
+        "criterion": "Education / certifications",
+        "score": 7,
+        "weight": 0.05,
+        "evidence_quote": "bachelor's degree in computer science",
+        "reasoning": "Meets the baseline degree requirement, with a statistics minor that is a plus for data-adjacent work."
+      },
+      {
+        "criterion": "Tenure stability",
+        "score": 6,
+        "weight": 0.05,
+        "evidence_quote": "three years at the previous company",
+        "reasoning": "Stable multi-year tenure with a clean transition into the current role."
+      }
+    ],
+    "matched_skills": ["Python", "SQL", "PostgreSQL", "Docker"],
+    "gaps": ["No sustained ownership of a customer-facing REST API", "Primary specialty is data pipelines, not backend services", "No container-orchestration experience listed"],
+    "summary": "A strong engineer overall, but from an adjacent domain -- data engineering rather than core backend service ownership -- so must-have coverage is the main open question.",
+    "meta": {
+      "provider": "seed",
+      "model": "seed-fixture-v1",
+      "rubric_version": "v1",
+      "prompt_version": "v1",
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "latency_ms": 0
+    }
+  }
+]

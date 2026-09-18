@@ -1,0 +1,57 @@
+[
+  {
+    "id": "a0000000-0000-4000-8000-000000000001",
+    "title": "Senior Backend Engineer",
+    "level": "Senior",
+    "location": "Bengaluru, India (Hybrid)",
+    "department": "Engineering",
+    "must_haves": [
+      "Python",
+      "Django or FastAPI",
+      "REST API design",
+      "Relational databases (PostgreSQL)",
+      "5+ years of backend engineering experience"
+    ],
+    "nice_to_haves": [
+      "Experience in fintech or another regulated industry",
+      "Kubernetes / container orchestration",
+      "Team leadership or mentoring experience",
+      "AWS or GCP"
+    ],
+    "min_years": 5,
+    "comp_min": 2500000,
+    "comp_max": 4000000,
+    "rubric_weights": [
+      {"criterion": "Must-have skills coverage", "weight": 0.30},
+      {"criterion": "Relevant years of experience", "weight": 0.20},
+      {"criterion": "Domain / industry fit", "weight": 0.15},
+      {"criterion": "Seniority & scope of ownership", "weight": 0.15},
+      {"criterion": "Project & impact evidence", "weight": 0.10},
+      {"criterion": "Education / certifications", "weight": 0.05},
+      {"criterion": "Tenure stability", "weight": 0.05}
+    ],
+    "description_md": "## Senior Backend Engineer\n\n**Location:** Bengaluru, India (Hybrid) · **Department:** Engineering\n\n### Summary\nWe're looking for a Senior Backend Engineer to own core services powering our platform, mentor mid-level engineers, and drive reliability improvements across our API layer.\n\n### Responsibilities\n- Design, build, and operate backend services in Python\n- Own the reliability and performance of core REST APIs\n- Mentor other engineers and review design docs\n- Partner with product on technical feasibility and scoping\n- Participate in an on-call rotation for production services\n\n### Requirements\n- 5+ years of backend software engineering experience\n- Strong proficiency in Python and at least one web framework (Django or FastAPI)\n- Experience designing REST APIs at scale\n- Solid understanding of relational databases and query performance (PostgreSQL)\n- Comfort owning a service end to end, including on-call\n\n### Nice to have\n- Experience in a regulated industry such as fintech or healthtech\n- Experience with Kubernetes or comparable container orchestration\n- Experience mentoring or leading other engineers\n- Familiarity with AWS or GCP\n\n### Compensation\n₹25,00,000 – ₹40,00,000 per annum, depending on experience.\n"
+  },
+  {
+    "id": "a0000000-0000-4000-8000-000000000002",
+    "title": "Product Manager, Platform Growth",
+    "level": "Mid-Senior",
+    "location": "Remote (India)",
+    "department": "Product",
+    "must_haves": [
+      "3+ years of product management experience",
+      "Experience with B2B SaaS",
+      "Strong analytical and SQL skills",
+      "Cross-functional stakeholder management"
+    ],
+    "nice_to_haves": [
+      "Experience in HR tech or fintech",
+      "Familiarity with experimentation / A-B testing frameworks"
+    ],
+    "min_years": 3,
+    "comp_min": 1800000,
+    "comp_max": 2800000,
+    "rubric_weights": null,
+    "description_md": "## Product Manager, Platform Growth\n\n**Location:** Remote (India) · **Department:** Product\n\n### Summary\nWe're hiring a Product Manager to own growth and activation across our platform, working closely with engineering, design, and data.\n\n### Responsibilities\n- Define and prioritize the platform growth roadmap\n- Partner with engineering and design on discovery and delivery\n- Run experiments and analyze funnel and activation metrics\n- Communicate progress and trade-offs to leadership and stakeholders\n\n### Requirements\n- 3+ years of product management experience, ideally in B2B SaaS\n- Strong analytical skills, including comfort writing SQL\n- Track record of shipping features that moved a growth metric\n- Excellent written and verbal stakeholder communication\n\n### Nice to have\n- Experience in HR tech, fintech, or another regulated domain\n- Familiarity with experimentation and A/B testing frameworks\n"
+  }
+]

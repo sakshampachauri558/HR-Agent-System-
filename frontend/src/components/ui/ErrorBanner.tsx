@@ -1,4 +1,3 @@
-import React from "react";
 import { Button } from "./Button";
 
 function cn(...classes: Array<string | false | null | undefined>): string {
