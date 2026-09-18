@@ -1,0 +1,26 @@
+# Pinned to sensible minimums (see backend/Dockerfile for why deps install
+# happens before source is copied). Do not pin exact patch versions here —
+# A1 owns this file; report a needed package instead of editing it yourself.
+
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.5
+pydantic-ai-slim[openai]>=0.0.14
+
+sqlalchemy[asyncio]>=2.0.35
+asyncpg>=0.29
+pgvector>=0.3.6
+
+fastembed>=0.3.6
+pypdf>=5.0
+
+python-multipart>=0.0.9
+httpx>=0.27
+sse-starlette>=2.1
+tenacity>=9.0
+
+ruff>=0.6
+pytest>=8.3
+pytest-asyncio>=0.24
+anyio>=4.4

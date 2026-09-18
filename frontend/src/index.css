@@ -1,0 +1,104 @@
+/*
+ * Global styles for PeopleOps Copilot.
+ *
+ * Tailwind v3 (A1's choice): classic three directives, driven by
+ * frontend/tailwind.config.js + postcss.config.js (content globs already
+ * cover ./index.html and ./src/**\/*.{ts,tsx}).
+ *
+ * Every color in this app is referenced as an arbitrary Tailwind value
+ * against the CSS variables below (e.g. `bg-[hsl(var(--card))]`) rather than
+ * custom theme tokens (`bg-card`), so none of this depends on a particular
+ * tailwind.config.js color extension existing.
+ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 222 47% 11%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 16% 47%;
+
+  --border: 214 32% 91%;
+
+  /* One accent color, used for primary actions, active nav, focus rings. */
+  --accent: 221 83% 53%;
+  --accent-foreground: 0 0% 100%;
+
+  --success: 142 71% 35%;
+  --warning: 38 92% 45%;
+  --danger: 0 72% 51%;
+  --info: 199 89% 42%;
+
+  --radius: 0.5rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 222 47% 8%;
+    --foreground: 210 20% 96%;
+
+    --card: 222 41% 11%;
+    --card-foreground: 210 20% 96%;
+
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 16% 65%;
+
+    --border: 217 33% 22%;
+
+    --accent: 217 91% 62%;
+    --accent-foreground: 222 47% 8%;
+
+    --success: 142 65% 50%;
+    --warning: 38 92% 58%;
+    --danger: 0 72% 63%;
+    --info: 199 89% 60%;
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  margin: 0;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+/* No page-level horizontal scroll on small screens. */
+html {
+  overflow-x: hidden;
+}

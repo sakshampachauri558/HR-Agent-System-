@@ -1,0 +1,9 @@
+.env
+node_modules
+__pycache__
+*.pyc
+.venv
+dist
+.DS_Store
+.ruff_cache
+.pytest_cache

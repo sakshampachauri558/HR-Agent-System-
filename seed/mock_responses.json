@@ -1,0 +1,239 @@
+{
+  "_comment": "Fixtures for backend/app/llm/mock.py, keyed by the name= passed to get_agent(...). Loaded once per process and reused for every call; MockAgent deep-copies before mutating. IMPORTANT for A5/A7: every non-null evidence_quote string under evaluation.criteria[*].evidence_quote MUST appear verbatim (case-sensitive, exact spacing) as a substring somewhere in every seed resume's text, because the F2 verification step (PRD §10) asserts each evidence_quote is a substring of resumes.redacted_text, and mock.py never rewrites these strings (only the numeric score/recommendation vary per resume, via a hash of the prompt). The full list to seed into EVERY seed/resumes/*.md file: 'built a Django REST API', '5 years of backend engineering experience', 'worked in the fintech sector', 'led a team of 4 engineers', 'reduced API latency by 30 percent', \"bachelor's degree in computer science\", 'three years at the previous company'. Keep them short, generic, and on their own line/sentence so they survive redaction and PDF/markdown parsing untouched.",
+
+  "chat_answer": {
+    "_comment": "Grounded answer, >=2 citations. document_title/section/quote here are illustrative; if a caller passes deps={'citations': [...]} or deps={'chunks': [...]} with real retrieved chunks, mock.py substitutes those chunk_id/document_title/section/quote values in instead so the citation chip -> source drawer flow can be exercised against real seeded documents.",
+    "answer": "Employees accrue 12 casual leave days per year, and up to 5 unused casual leave days carry forward into the next calendar year with manager approval [^11111111-1111-1111-1111-111111111111]. Carried-over days must be used within the first quarter of the new year or they are forfeited [^22222222-2222-2222-2222-222222222222].",
+    "citations": [
+      {
+        "chunk_id": "11111111-1111-1111-1111-111111111111",
+        "document_title": "Leave Policy",
+        "section": "3.2 Casual Leave Carryover",
+        "quote": "Up to 5 unused casual leave days may carry forward into the next calendar year with manager approval.",
+        "start_char": 420,
+        "end_char": 522
+      },
+      {
+        "chunk_id": "22222222-2222-2222-2222-222222222222",
+        "document_title": "Leave Policy",
+        "section": "3.3 Use-It-By Window",
+        "quote": "Carried-over casual leave days must be used within the first quarter of the following year or they are forfeited.",
+        "start_char": 523,
+        "end_char": 640
+      }
+    ],
+    "grounded": true,
+    "provider": "mock",
+    "model": "mock-fixture-v1"
+  },
+
+  "chat_refusal": {
+    "_comment": "grounded=false, no citations, no fabrication -- the mandatory refusal path from PRD F1.",
+    "answer": "That isn't covered in the policies I have — here's who to ask: reach out to peopleops@company.example about contractor work-from-home arrangements.",
+    "citations": [],
+    "grounded": false,
+    "provider": "mock",
+    "model": "mock-fixture-v1"
+  },
+
+  "evaluation": {
+    "_comment": "All 7 DEFAULT_RUBRIC criteria (schemas.py), weights sum to 1.0. evidence_quote strings must stay verbatim substrings of seeded resume text -- see top-level _comment for the exact list. mock.py's _vary_evaluation() perturbs score/fit_score/recommendation deterministically per resume (via a hash of the prompt) but never edits evidence_quote text itself.",
+    "id": "33333333-3333-3333-3333-333333333333",
+    "resume_id": "44444444-4444-4444-4444-444444444444",
+    "job_id": "55555555-5555-5555-5555-555555555555",
+    "fit_score": 72,
+    "recommendation": "yes",
+    "criteria": [
+      {
+        "criterion": "Must-have skills coverage",
+        "score": 8,
+        "weight": 0.30,
+        "evidence_quote": "built a Django REST API",
+        "reasoning": "Demonstrates the core backend stack called for in the job description."
+      },
+      {
+        "criterion": "Relevant years of experience",
+        "score": 7,
+        "weight": 0.20,
+        "evidence_quote": "5 years of backend engineering experience",
+        "reasoning": "Meets the stated minimum years for this level."
+      },
+      {
+        "criterion": "Domain / industry fit",
+        "score": 6,
+        "weight": 0.15,
+        "evidence_quote": "worked in the fintech sector",
+        "reasoning": "Adjacent industry experience rather than an exact domain match."
+      },
+      {
+        "criterion": "Seniority & scope of ownership",
+        "score": 8,
+        "weight": 0.15,
+        "evidence_quote": "led a team of 4 engineers",
+        "reasoning": "Shows people-management scope appropriate to a senior role."
+      },
+      {
+        "criterion": "Project & impact evidence",
+        "score": 7,
+        "weight": 0.10,
+        "evidence_quote": "reduced API latency by 30 percent",
+        "reasoning": "Quantified, verifiable impact on a shipped project."
+      },
+      {
+        "criterion": "Education / certifications",
+        "score": 6,
+        "weight": 0.05,
+        "evidence_quote": "bachelor's degree in computer science",
+        "reasoning": "Meets the baseline education bar; no advanced certification listed."
+      },
+      {
+        "criterion": "Tenure stability",
+        "score": 5,
+        "weight": 0.05,
+        "evidence_quote": "three years at the previous company",
+        "reasoning": "Reasonable tenure with no red flags, but no standout loyalty signal either."
+      }
+    ],
+    "matched_skills": ["Python", "Django", "REST APIs", "Team leadership", "SQL"],
+    "gaps": ["No direct fintech domain experience", "No cloud certification listed", "Limited evidence of Kubernetes experience"],
+    "summary": "A solid backend engineer with clear ownership and impact evidence; domain fit and infra breadth are the main open questions.",
+    "meta": {
+      "provider": "mock",
+      "model": "mock-fixture-v1",
+      "rubric_version": "v1",
+      "prompt_version": "v1",
+      "input_tokens": 820,
+      "output_tokens": 260,
+      "latency_ms": 850
+    }
+  },
+
+  "jd": {
+    "_comment": "F3 JD Studio output. Rich/superset fields on purpose -- Pydantic v2 ignores unknown fields by default, so this fixture validates against whatever subset of fields A6's own output model actually declares (e.g. a plain Job-shaped model, or a richer GeneratedJD with responsibilities/requirements/benefits split out). description_md is the field most likely to map directly onto jobs.description_md.",
+    "title": "Senior Backend Engineer",
+    "level": "Senior",
+    "department": "Engineering",
+    "location": "Remote (US)",
+    "summary": "We're looking for a Senior Backend Engineer to own core services powering our platform, mentor mid-level engineers, and drive reliability improvements across our API layer.",
+    "responsibilities": [
+      "Design, build, and operate backend services in Python and Go",
+      "Own the reliability and performance of core APIs",
+      "Mentor mid-level engineers and review design docs",
+      "Partner with product and design on technical feasibility",
+      "Participate in an on-call rotation for production services"
+    ],
+    "requirements": [
+      "5+ years of backend software engineering experience",
+      "Strong proficiency in Python and at least one statically typed language",
+      "Experience designing REST or gRPC APIs at scale",
+      "Solid understanding of relational databases and query performance",
+      "Experience mentoring or leading other engineers"
+    ],
+    "nice_to_haves": [
+      "Experience with Kubernetes and container orchestration",
+      "Experience in a regulated industry (fintech, healthtech)",
+      "Familiarity with event-driven architectures"
+    ],
+    "benefits": [
+      "Fully remote, flexible hours",
+      "Comprehensive health, dental, and vision coverage",
+      "Annual learning and development stipend",
+      "Equity in the company"
+    ],
+    "must_haves": ["Python", "REST API design", "Relational databases", "5+ years backend experience"],
+    "min_years": 5,
+    "comp_min": 150000,
+    "comp_max": 190000,
+    "description_md": "## Senior Backend Engineer\n\n**Location:** Remote (US) · **Department:** Engineering\n\n### Summary\nWe're looking for a Senior Backend Engineer to own core services powering our platform, mentor mid-level engineers, and drive reliability improvements across our API layer.\n\n### Responsibilities\n- Design, build, and operate backend services in Python and Go\n- Own the reliability and performance of core APIs\n- Mentor mid-level engineers and review design docs\n- Partner with product and design on technical feasibility\n- Participate in an on-call rotation for production services\n\n### Requirements\n- 5+ years of backend software engineering experience\n- Strong proficiency in Python and at least one statically typed language\n- Experience designing REST or gRPC APIs at scale\n- Solid understanding of relational databases and query performance\n- Experience mentoring or leading other engineers\n\n### Nice to have\n- Experience with Kubernetes and container orchestration\n- Experience in a regulated industry (fintech, healthtech)\n- Familiarity with event-driven architectures\n\n### Benefits\n- Fully remote, flexible hours\n- Comprehensive health, dental, and vision coverage\n- Annual learning and development stipend\n- Equity in the company\n",
+    "inclusive_language_flags": [
+      {
+        "phrase": "rockstar engineer",
+        "reason": "Coded, exclusionary tech-culture language that can discourage a broad candidate pool.",
+        "suggestion": "skilled engineer"
+      },
+      {
+        "phrase": "recent graduate",
+        "reason": "Implies an age preference; risky phrasing for a senior-level posting.",
+        "suggestion": "candidates early in their career"
+      }
+    ]
+  },
+
+  "interview_kit": {
+    "_comment": "F4 output: 8 questions, first 6 target gaps from the evaluation fixture above (fintech domain fit, cloud certification, Kubernetes/infra breadth -- reused twice with different framing so >=2 named gaps are referenced), last 2 validate claimed strengths (Django API work, team leadership). If the caller's output_type is a bare list[InterviewQuestion] rather than a wrapper model, mock.py auto-unwraps this single list-valued field.",
+    "questions": [
+      {
+        "question": "Walk me through a project where you had to work closely with compliance, risk, or finance stakeholders.",
+        "targets": "No direct fintech domain experience",
+        "good_answer": "Describes a concrete project with a regulated or compliance-sensitive stakeholder, the constraints involved, and how they adapted their engineering approach.",
+        "follow_up": "What would you do differently if the regulatory requirements changed mid-project?",
+        "scoring_anchor": "Score high if they show they understand why domain constraints (audit trails, data residency, approvals) change engineering decisions, not just that they've 'heard of' them."
+      },
+      {
+        "question": "How would you approach ramping up on the regulatory or industry-specific requirements of a fintech product in your first 90 days?",
+        "targets": "No direct fintech domain experience",
+        "good_answer": "Names concrete sources (compliance team, existing runbooks, past incident reviews) and a plan to validate assumptions before shipping.",
+        "follow_up": "Who would you go to first, and why?",
+        "scoring_anchor": "Score low if the answer is generic 'I'd read the docs' with no plan to engage domain experts."
+      },
+      {
+        "question": "Tell me about a service you've deployed to a managed Kubernetes cluster, or a comparable container orchestration setup.",
+        "targets": "Limited evidence of Kubernetes experience",
+        "good_answer": "Concrete detail on deployment manifests, scaling, or failure handling in a container-orchestrated environment.",
+        "follow_up": "How did you handle a rollout that went wrong?",
+        "scoring_anchor": "Score high for specific incident detail; score low for purely conceptual/theoretical familiarity."
+      },
+      {
+        "question": "How comfortable are you owning infrastructure-as-code for the services you build, versus handing that off to a platform team?",
+        "targets": "Limited evidence of Kubernetes experience",
+        "good_answer": "Clear stance with a real example of writing or reviewing infra config (Terraform, Helm, k8s manifests) themselves.",
+        "follow_up": "What's the riskiest infra change you've personally shipped?",
+        "scoring_anchor": "Score based on ownership demonstrated, not tool-name-dropping."
+      },
+      {
+        "question": "Do you hold or plan to pursue any cloud certifications (AWS/GCP/Azure)? Why or why not?",
+        "targets": "No cloud certification listed",
+        "good_answer": "A reasoned position either way -- certifications aren't required to be strong, but the answer should show they understand the tradeoffs of formal certification vs. hands-on experience.",
+        "follow_up": "What's a cloud concept you learned the hard way, on the job, rather than from a course?",
+        "scoring_anchor": "Score on the quality of reasoning and hands-on evidence, not on whether they hold a certificate."
+      },
+      {
+        "question": "Describe the most complex production incident you've debugged involving cloud infrastructure.",
+        "targets": "No cloud certification listed",
+        "good_answer": "Specific incident, root cause, and the infrastructure-level fix (not just an application-code fix).",
+        "follow_up": "What monitoring or alerting would have caught this sooner?",
+        "scoring_anchor": "Score high for systems-level root-causing; score low if the story stays entirely at the application layer."
+      },
+      {
+        "question": "Tell me about the Django REST API you built — what was it for, and what was the hardest design decision?",
+        "targets": "built a Django REST API",
+        "good_answer": "Specific, technically detailed walkthrough matching what's on the resume; can explain tradeoffs (serialization, auth, pagination, versioning).",
+        "follow_up": "How did you handle backwards compatibility as the API evolved?",
+        "scoring_anchor": "Score low if the description is vague or doesn't match the resume's claim under questioning."
+      },
+      {
+        "question": "You mentioned leading a team of 4 engineers — how did you split ownership, and how did you handle a disagreement about technical direction?",
+        "targets": "led a team of 4 engineers",
+        "good_answer": "Concrete account of delegation, decision-making process, and a real disagreement with a resolution.",
+        "follow_up": "What would you do differently if you led that team again?",
+        "scoring_anchor": "Score high for specific, honest reflection; score low for a generic 'we communicated well' non-answer."
+      }
+    ]
+  },
+
+  "analytics_query": {
+    "_comment": "F6 NL->SQL output. Superset of a plain {sql, rows, explanation} shape (schemas.AnalyticsQueryResponse) AND a structured query-plan shape (table/columns/filters/group_by), since A9 owns the actual output_type and either design satisfies PRD's 'typed output against an allowlist' requirement. Extra fields are ignored by Pydantic v2 validation when unused.",
+    "sql": "SELECT recommendation, count(*) AS n FROM evaluations GROUP BY recommendation ORDER BY n DESC",
+    "rows": [
+      {"recommendation": "yes", "n": 2},
+      {"recommendation": "maybe", "n": 2},
+      {"recommendation": "strong_yes", "n": 1}
+    ],
+    "explanation": "Counted evaluations by recommendation band, grouped and sorted by count descending, run read-only as the analytics_ro role.",
+    "table": "evaluations",
+    "columns": ["recommendation"],
+    "filters": {},
+    "group_by": ["recommendation"],
+    "aggregation": "count"
+  }
+}

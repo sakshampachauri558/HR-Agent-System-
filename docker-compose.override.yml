@@ -34,7 +34,14 @@ services:
       # Anonymous volume stops the host bind mount from shadowing the image's
       # node_modules (which is built for the container's platform).
       - /app/node_modules
-    ports:
+    # Compose merges (not replaces) `ports` lists across files by default,
+    # and the base docker-compose.yml already publishes a frontend port
+    # (5173:80, for the nginx runtime target). Without `!override` here,
+    # both mappings survive the merge and this service tries to publish
+    # host port 5173 twice, which fails with "port is already allocated"
+    # regardless of which host port is actually free. `!override` replaces
+    # the base list outright instead of appending to it (Compose 2.24+).
+    ports: !override
       - "${FRONTEND_PORT:-5173}:5173"
     environment:
       # Vite dev server proxies /api to the backend; see vite.config.ts.
