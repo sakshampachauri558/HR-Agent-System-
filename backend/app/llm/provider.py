@@ -5,7 +5,7 @@ get an LLM-backed Pydantic AI `Agent`. It never constructs an OpenAI
 client itself, never hardcodes a model name outside `PROVIDERS`, and
 never branches on provider — when `LLM_PROVIDER=mock` it transparently
 returns `app.llm.mock.MockAgent` instead, which exposes the identical
-`await agent.run(user_prompt, deps=...)` -> `.output` / `.usage()`
+`await agent.run(user_prompt, deps=...)` -> `.output` / `.usage`
 surface.
 
 Every completed call (mock or real) writes one `audit_log` row via
@@ -55,7 +55,11 @@ PROVIDERS: dict[str, Provider] = {
     "openrouter": Provider(
         base_url="https://openrouter.ai/api/v1",
         api_key_env="OPENROUTER_API_KEY",
-        default_model="meta-llama/llama-3.3-70b-instruct:free",
+        # Verified 2026-09-19: reachable AND supports tool calling, which F2's
+        # agent requires. llama-3.3-70b-instruct:free was the original default
+        # and moved behind payment ("This model is unavailable for free").
+        # Free slugs churn; override with LLM_MODEL rather than editing code.
+        default_model="deepseek/deepseek-v4-flash-0731:free",
         extra_headers={"HTTP-Referer": settings.app_url, "X-Title": "PeopleOps Copilot"},
     ),
     "groq": Provider(
@@ -151,7 +155,7 @@ class _ThrottledAgent:
         if cached is not None:
             return cached
         cfg = PROVIDERS[provider_key]
-        model_name = self._explicit_model or cfg.default_model
+        model_name = self._explicit_model or settings.llm_model or cfg.default_model
         api_key = _resolve_api_key(provider_key)
         client = AsyncOpenAI(
             base_url=cfg.base_url,
@@ -179,7 +183,9 @@ class _ThrottledAgent:
             await check_budget(session)  # raises BudgetExhausted if today's cap is hit
 
         primary = settings.llm_provider
-        provider_used, model_used = primary, self._explicit_model or PROVIDERS[primary].default_model
+        provider_used, model_used = primary, (
+            self._explicit_model or settings.llm_model or PROVIDERS[primary].default_model
+        )
         start = time.monotonic()
         try:
             result = await self._attempt(primary, user_prompt, kwargs)
@@ -208,7 +214,7 @@ class _ThrottledAgent:
                 raise
 
         latency_ms = int((time.monotonic() - start) * 1000)
-        input_tokens, output_tokens = _extract_tokens(result.usage())
+        input_tokens, output_tokens = _extract_tokens(result.usage)
         async with session_scope() as session:
             await record_llm_call(
                 session,
@@ -225,7 +231,7 @@ class _ThrottledAgent:
         # already knows the truth. `pydantic_ai`'s `AgentRunResult` is a
         # plain, non-frozen, non-slotted dataclass, so attaching extra
         # attributes here is safe and additive: nothing existing is
-        # renamed, removed, or restructured, and `.output`/`.usage()` are
+        # renamed, removed, or restructured, and `.output`/`.usage` are
         # untouched. Callers (e.g. `agents/evaluator.py`) should prefer
         # these over `settings.llm_provider` when recording
         # `evaluations.provider` / `evaluations.model`.
@@ -246,7 +252,7 @@ def get_agent(
 
     Real callers never see the difference between this and a bare
     `pydantic_ai.Agent`: both expose `await agent.run(prompt, deps=...)`
-    returning an object with `.output` and `.usage()`. When
+    returning an object with `.output` and `.usage`. When
     `LLM_PROVIDER=mock` (the committed default) this returns
     `app.llm.mock.MockAgent` and no network call is made.
     """
@@ -269,7 +275,7 @@ async def health() -> dict[str, Any]:
 
     provider_key = settings.llm_provider
     cfg = PROVIDERS.get(provider_key)
-    model_name = cfg.default_model if cfg else "unknown"
+    model_name = settings.llm_model or (cfg.default_model if cfg else "unknown")
     async with session_scope() as session:
         used = await budget_used_today(session)
     reachable = provider_key == "mock" or (cfg is not None and _has_api_key(provider_key))

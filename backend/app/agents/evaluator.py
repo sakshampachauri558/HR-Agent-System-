@@ -321,7 +321,7 @@ async def evaluate_resume(resume_id: UUID, job_id: UUID) -> EvaluationResult:
     latency_ms = int((time.monotonic() - started) * 1000)
 
     output: EvaluationResult = run_result.output
-    usage = run_result.usage()
+    usage = run_result.usage
     input_tokens = int(getattr(usage, "request_tokens", None) or getattr(usage, "input_tokens", None) or 0)
     output_tokens = int(getattr(usage, "response_tokens", None) or getattr(usage, "output_tokens", None) or 0)
 

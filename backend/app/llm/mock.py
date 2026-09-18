@@ -5,7 +5,7 @@ real network call to any LLM provider.
 `MockAgent` duck-types the surface of a Pydantic AI `Agent` that callers
 actually use: `await agent.run(user_prompt, deps=...)` returning an object
 with `.output` (validated against the `output_type` passed to
-`get_agent`) and `.usage()`. It never touches the network, is fully
+`get_agent`) and `.usage`. It never touches the network, is fully
 deterministic (same input -> same output), and still writes an
 `audit_log` row so the throttle/budget-counting machinery in `throttle.py`
 gets exercised even when nothing real is being called.
@@ -296,7 +296,14 @@ class MockResult:
         self.data = output  # older pydantic_ai alias some callers may still read
         self._usage = usage
 
+    @property
     def usage(self) -> MockUsage:
+        # A property, NOT a method, because pydantic_ai's real
+        # `AgentRunResult.usage` is a property. When this was a method the
+        # whole app passed its tests against the mock and raised
+        # `'RunUsage' object is not callable` on the first real provider
+        # call. A mock that diverges from the SDK it stands in for hides
+        # exactly the bugs it exists to catch.
         return self._usage
 
 

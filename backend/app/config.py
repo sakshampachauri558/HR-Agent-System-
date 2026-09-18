@@ -36,6 +36,10 @@ class Settings(BaseSettings):
     # real default (openrouter) as an env var for the containerized run.
     llm_provider: str = "mock"
     llm_fallback_provider: str = "groq"
+    # Overrides the provider's default_model. Free model slugs churn —
+    # OpenRouter moved llama-3.3-70b-instruct:free behind payment — so the
+    # model must be swappable without a code change.
+    llm_model: str = ""
     llm_rpm: int = 18
     llm_daily_budget: int = 45
     eval_concurrency: int = 2
