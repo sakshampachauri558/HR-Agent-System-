@@ -12,7 +12,7 @@ export default defineConfig({
       // frontend container's network, matching nginx's proxy in production
       // so dev and prod behave the same way.
       "/api": {
-        target: "http://backend:8000",
+        target: "http://localhost:8000",
         changeOrigin: true,
       },
     },
