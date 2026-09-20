@@ -1,5 +1,6 @@
 # PeopleOps Copilot
 
+To run this project - http://147.93.107.219:5173/chat
 A containerized HR AI suite: grounded policy Q&A over your own documents, and
 an agentic resume-vs-JD evaluator — built to run entirely on free LLM
 inference.
